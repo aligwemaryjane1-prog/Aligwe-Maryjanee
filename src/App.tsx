@@ -1,103 +1,78 @@
 import React, { useState } from 'react';
-import { Navigation } from './components/Navigation';
-import { Hero } from './components/Hero';
-import { TrustBar } from './components/TrustBar';
-import { FeaturedProjects } from './components/FeaturedProjects';
-import { IndustryStorySection } from './components/IndustryStorySection';
-import { Services } from './components/Services';
-import { About } from './components/About';
-import { Process } from './components/Process';
-import { Testimonials } from './components/Testimonials';
-import { Blog } from './components/Blog';
-import { TechStack } from './components/TechStack';
-import { Statistics } from './components/Statistics';
-import { Contact } from './components/Contact';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { ProjectModal } from './components/ProjectModal';
-import { BookingModal } from './components/BookingModal';
-import { CustomCursor } from './components/CustomCursor';
-import { Project } from './types/portfolio';
+import { AppointmentModal } from './components/AppointmentModal';
+import { ScrollToTop } from './components/ScrollToTop';
 
-export default function App() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [prefilledScope, setPrefilledScope] = useState<string[]>([]);
-  const [prefilledBudget, setPrefilledBudget] = useState<number | undefined>(undefined);
+// Pages
+import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
+import { ServicesPage } from './pages/ServicesPage';
+import { ServiceDetailPage } from './pages/ServiceDetailPage';
+import { TechnologyPage } from './pages/TechnologyPage';
+import { PatientInfoPage } from './pages/PatientInfoPage';
+import { SmileGalleryPage } from './pages/SmileGalleryPage';
+import { TestimonialsPage } from './pages/TestimonialsPage';
+import { BlogPage } from './pages/BlogPage';
+import { BlogArticlePage } from './pages/BlogArticlePage';
+import { ContactPage } from './pages/ContactPage';
+import { BookAppointmentPage } from './pages/BookAppointmentPage';
+import { EmergencyPage } from './pages/EmergencyPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { TermsOfServicePage } from './pages/TermsOfServicePage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
-  const handleSelectScopeForBooking = (services: string[], estimatedPrice: number) => {
-    setPrefilledScope(services);
-    setPrefilledBudget(estimatedPrice);
-    const element = document.getElementById('contact');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+export function App() {
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState<boolean>(false);
+  const [selectedServiceForModal, setSelectedServiceForModal] = useState<string | undefined>(undefined);
+
+  const handleOpenBookingModal = (serviceId?: string) => {
+    setSelectedServiceForModal(serviceId);
+    setIsBookingModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#111111] font-sans relative selection:bg-[#0A66FF] selection:text-white">
-      {/* Custom Follower Cursor */}
-      <CustomCursor />
+    <BrowserRouter>
+      <ScrollToTop />
+      <div className="min-h-screen bg-[#FAF9F6] text-slate-900 font-sans flex flex-col justify-between selection:bg-sky-200 selection:text-sky-900">
+        {/* Navigation Bar */}
+        <Navbar onOpenBookingModal={() => handleOpenBookingModal()} />
 
-      {/* Navigation Header */}
-      <Navigation onOpenBooking={() => setIsBookingOpen(true)} />
+        {/* Dynamic Route View */}
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<HomePage onOpenBooking={handleOpenBookingModal} />} />
+            <Route path="/about" element={<AboutPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/services" element={<ServicesPage onOpenBooking={handleOpenBookingModal} />} />
+            <Route path="/services/:serviceId" element={<ServiceDetailPage onOpenBooking={handleOpenBookingModal} />} />
+            <Route path="/technology" element={<TechnologyPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/patient-information" element={<PatientInfoPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/smile-gallery" element={<SmileGalleryPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/testimonials" element={<TestimonialsPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:articleId" element={<BlogArticlePage />} />
+            <Route path="/contact" element={<ContactPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/book-appointment" element={<BookAppointmentPage />} />
+            <Route path="/emergency-dentistry" element={<EmergencyPage onOpenBooking={() => handleOpenBookingModal()} />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
 
-      {/* Main Agency Experience */}
-      <main>
-        {/* 1. Hero Statement & Interactive Showcase */}
-        <Hero onOpenBooking={() => setIsBookingOpen(true)} />
+        {/* Global Appointment Modal */}
+        <AppointmentModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          initialServiceId={selectedServiceForModal}
+        />
 
-        {/* 2. Core Capabilities & Specialization Trust Bar */}
-        <TrustBar />
-
-        {/* 3. Selected Transformations (Case Studies) */}
-        <FeaturedProjects onSelectProject={(project) => setSelectedProject(project)} />
-
-        {/* 4. Every Business Has A Story (Industry Transformations) */}
-        <IndustryStorySection />
-
-        {/* 5. How I Help Businesses Grow (Outcome Cards & Estimator) */}
-        <Services onSelectScopeForBooking={handleSelectScopeForBooking} />
-
-        {/* 6. 7-Stage Process Timeline */}
-        <Process />
-
-        {/* 7. About & Philosophy */}
-        <About />
-
-        {/* 8. Tech Stack Capsules */}
-        <TechStack />
-
-        {/* 9. Key Impact Metrics */}
-        <Statistics />
-
-        {/* 10. Client Testimonials Slider */}
-        <Testimonials />
-
-        {/* 11. Thought Leadership & Blog Insights */}
-        <Blog />
-
-        {/* 12. Contact & Inquiry Form */}
-        <Contact prefilledScope={prefilledScope} prefilledBudget={prefilledBudget} />
-      </main>
-
-      {/* Agency Footer */}
-      <Footer />
-
-      {/* Project Detail Modal */}
-      <ProjectModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-        onOpenBooking={() => {
-          setSelectedProject(null);
-          setIsBookingOpen(true);
-        }}
-      />
-
-      {/* Discovery Call Booking Modal */}
-      <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
-    </div>
+        {/* Global Footer */}
+        <Footer onOpenBookingModal={() => handleOpenBookingModal()} />
+      </div>
+    </BrowserRouter>
   );
 }
+
+export default App;
